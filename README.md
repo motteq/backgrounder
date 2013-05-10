@@ -18,42 +18,41 @@ Or install it yourself as:
 
 ## Usage
 
-    class Dummy < ActiveRecord::Base
-      include Backgrounder::Handler
+```ruby
+class Dummy < ActiveRecord::Base
+  include Backgrounder::Handler
 
-      @queue = :high
+  @queue = :high
 
-      def self.foo
-        # ...
-      end
+  def self.foo
+    # ...
+  end
 
-      def bar
-        # ...
-      end
-    end
+  def bar
+    # ...
+  end
+end
 
-    dummy = Dummy.create
+dummy = Dummy.create
+Backgrounder::Placer.new(Dummy, :foo).place
+Backgrounder::Placer.new(dummy, :bar, queue: :processing).place
 
-    Backgrounder::Placer.new(Dummy, :foo).place
+class Puppet
+  include Backgrounder::Handler
 
-    Backgrounder::Placer.new(dummy, :bar, queue: :processing).place
+  def initialize args={}
+    # ...
+  end
 
+  def foo
+    # ...
+  end
+end
 
-    class Puppet
-      include Backgrounder::Handler
-
-      def initialize args={}
-        # ...
-      end
-
-      def foo
-        # ...
-      end
-    end
-
-    Backgrounder::Placer.new(Puppet, :foo, args: {
-      init_args: {content: 'foo', phone: 'bar'}
-    }, queue: :critical).place  # Puppet.new('content' => 'foo', 'phone' => 'bar'}).foo
+Backgrounder::Placer.new(Puppet, :foo, args: {
+  init_args: {content: 'foo', phone: 'bar'}
+}, queue: :critical).place  # Puppet.new('content' => 'foo', 'phone' => 'bar'}).foo
+```
 
 ## Contributing
 
